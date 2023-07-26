@@ -42,4 +42,25 @@ export default class TeachersController {
       return response.status(400).json(error.messages)
     }
   }
+
+  public async show ({ params, response }: HttpContextContract){
+    try{
+      // Consulta o professor pelo ID e seleciona apenas os campos desejados
+      const teacher = await Teacher.query()
+        .where('id', params.id)
+        .select('id', 'name', 'email', 'registration', 'birthdate')
+        .first()
+      if (teacher) {
+        // Retorna os dados do professor se encontrado
+        return response.status(200).json(teacher)
+      } else {
+        // Se nenhum professor for encontrado com o número do ID informado
+        return response.status(404).json({ message: 'Not Found' })
+      }
+    } catch (error) {
+      // Trata quaisquer erros que ocorram durante o processo
+      console.log(error)
+      return response.status(500).json(error.message)
+    }
+  }
 }
