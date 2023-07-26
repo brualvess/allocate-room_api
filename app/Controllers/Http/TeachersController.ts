@@ -9,10 +9,10 @@ export default class TeachersController {
       const data = await request.validate(TeacherValidator)
 
       // Obtém o último registro de professor para determinar o número sequencial da matrícula
-      const lastStudent = await Teacher.query().orderBy('id', 'desc').first()
+      const lastTeacher = await Teacher.query().orderBy('id', 'desc').first()
 
       // Gera o número sequencial da matrícula
-      const sequentialNumber = lastStudent ? lastStudent.id + 1 : 1
+      const sequentialNumber = lastTeacher ? lastTeacher.id + 1 : 1
       const formattedSequentialNumber = sequentialNumber.toString().padStart(4, '0')
 
       // Cria a matrícula no formato "PR0010" (por exemplo)
