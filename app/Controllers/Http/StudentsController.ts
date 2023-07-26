@@ -1,11 +1,11 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Student from 'App/Models/Student'
-import EmailValidator from 'App/Validators/StudentValidator'
+import StudentValidator from 'App/Validators/StudentValidator'
 export default class StudentsController {
   public async store ({ request, response }: HttpContextContract) {
     try {
       // Valida os dados recebidos na requisição usando o método validate do objeto request
-      const data = await request.validate(EmailValidator)
+      const data = await request.validate(StudentValidator)
 
       // Obtém o último registro de aluno para determinar o número sequencial da matrícula
       const lastStudent = await Student.query().orderBy('id', 'desc').first()
@@ -62,6 +62,30 @@ export default class StudentsController {
       return response.status(500).json(error.message)
     }
   }
+
+  public async update ({params, request, response } : HttpContextContract){
+    try{
+      // Valida os dados recebidos na requisição usando o StudentValidator
+      const data = await request.validate(StudentValidator)
+
+      // Encontra o aluno pelo ID
+      const student = await Student.findOrFail(params.id)
+
+      // Atualiza os dados do aluno com os novos valores
+      student.name = data.name
+      student.email = data.email
+      student.birthdate = data.birthdate
+
+      // Salva o registro do aluno atualizado
+      await student.save()
+      return response.status(200).json('Updated')
+    } catch (error) {
+      // Trata quaisquer erros que ocorram durante o processo
+      console.log(error)
+      return response.status(500).json(error.message)
+    }
+  }
+
   public async destroy ({ params, response }: HttpContextContract){
     try{
       // Busca o aluno pelo ID
