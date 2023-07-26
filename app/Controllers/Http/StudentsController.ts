@@ -22,19 +22,25 @@ export default class StudentsController {
         name: data.name,
         email: data.email,
         registration: registration,
-        birthdate:data.birthdate,
+        birthdate: data.birthdate,
 
       }
-      // Se a validação passar, cria um novo aluno com os dados da requisição
-      await Student.create({...obj})
-
-      // Retorna o novo aluno criado na resposta
-      return response.status(201).json({
-        message: 'Created',
-        name: obj.name,
-        registration: obj.registration,
-
-      })
+      // Verificar se o e-mail já está cadastrado
+      const checkEmail = await Student.findBy('email', obj.email)
+      if (checkEmail) {
+        return response.status(404).json({
+          message: 'Conflict',
+        })
+      } else {
+        // Se não existir, cria um novo aluno com os dados da requisição
+        await Student.create({ ...obj })
+        // Retorna o novo aluno criado na resposta
+        return response.status(201).json({
+          message: 'Created',
+          name: obj.name,
+          registration: obj.registration,
+        })
+      }
     } catch (error) {
       // Se a validação falhar, retorna as mensagens de erro
       console.log(error)
@@ -42,8 +48,8 @@ export default class StudentsController {
     }
   }
 
-  public async show ({ params, response }: HttpContextContract){
-    try{
+  public async show ({ params, response }: HttpContextContract) {
+    try {
       // Consulta o aluno pelo ID e seleciona apenas os campos desejados
       const student = await Student.query()
         .where('id', params.id)
@@ -63,10 +69,10 @@ export default class StudentsController {
     }
   }
 
-  public async update ({params, request, response } : HttpContextContract){
+  public async update ({ params, request, response }: HttpContextContract) {
     try{
-      // Valida os dados recebidos na requisição usando o StudentValidator
-      const data = await request.validate(StudentValidator)
+      // Dados recebidos na requisição 
+      const data = await request.all()
 
       // Encontra o aluno pelo ID
       const student = await Student.findOrFail(params.id)
@@ -86,8 +92,8 @@ export default class StudentsController {
     }
   }
 
-  public async destroy ({ params, response }: HttpContextContract){
-    try{
+  public async destroy ({ params, response }: HttpContextContract) {
+    try {
       // Busca o aluno pelo ID
       const student = await Student.findByOrFail('id', params.id)
       if (student) {
@@ -95,7 +101,7 @@ export default class StudentsController {
         await student.delete()
         return response.status(200).json('Deleted')
       }
-    }catch (error) {
+    } catch (error) {
       // Trata quaisquer erros que ocorram durante o processo
       console.log(error)
       return response.status(500).json(error.message)

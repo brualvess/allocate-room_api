@@ -18,24 +18,22 @@ export default class TeachersController {
       // Cria a matrícula no formato "PR0010" (por exemplo)
       const registration = `PR${formattedSequentialNumber}`
 
-      // Cria o objeto que contera os dados do professor
-      const obj = {
-        name: data.name,
-        email: data.email,
-        registration: registration,
-        birthdate:data.birthdate,
-
+      // Verificar se o e-mail já está cadastrado
+      const checkEmail = await Teacher.findBy('email', data.email)
+      if (checkEmail) {
+        return response.status(404).json({
+          message: 'Conflict',
+        })
+      } else {
+        // Se não estiver cadastrado, cria um novo professor com os dados da requisição
+        await Teacher.create({ ...data })
+        // Retorna nome e matrícula na resposta
+        return response.status(201).json({
+          message: 'Created',
+          name: data.name,
+          registration: registration,
+        })
       }
-      // Se a validação passar, cria um novo professor com os dados da requisição
-      await Teacher.create({...obj})
-
-      // Retorna o novo professor criado na resposta
-      return response.status(201).json({
-        message: 'Created',
-        name: obj.name,
-        registration: obj.registration,
-
-      })
     } catch (error) {
       // Se a validação falhar, retorna as mensagens de erro
       console.log(error)
@@ -66,8 +64,8 @@ export default class TeachersController {
 
   public async update ({params, request, response } : HttpContextContract){
     try{
-      // Valida os dados recebidos na requisição usando o TeacherValidator
-      const data = await request.validate(TeacherValidator)
+      // Dados recebidos na requisição
+      const data = await request.all()
 
       // Encontra o professor pelo ID
       const teacher = await Teacher.findOrFail(params.id)

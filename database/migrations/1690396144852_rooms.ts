@@ -1,3 +1,4 @@
+
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
@@ -7,8 +8,8 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('room_number').notNullable().unique().unsigned()
-      table.integer('capacity').defaultTo(30)
-      table.integer('teacher_id').unsigned().references('professores.id').onDelete('CASCADE')
+      table.integer('capacity').notNullable()
+      table.integer('teacher_id').unsigned().references('id').inTable('teachers').onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

@@ -1,5 +1,7 @@
+
 import { DateTime } from 'luxon'
-import { BaseModel, column, ManyToMany, manyToMany} from '@ioc:Adonis/Lucid/Orm'
+import Teacher from './Teacher'
+import { BaseModel, column, ManyToMany, manyToMany, belongsTo, BelongsTo} from '@ioc:Adonis/Lucid/Orm'
 
 import Student from './Student'
 
@@ -26,4 +28,9 @@ export default class Room extends BaseModel {
     pivotTable: 'room_student',
   })
   public students: ManyToMany<typeof Student>
+
+  @belongsTo(() => Teacher, {
+    foreignKey: 'teacher_id',
+  })
+  public teacher: BelongsTo<typeof Teacher>
 }
