@@ -63,4 +63,27 @@ export default class TeachersController {
       return response.status(500).json(error.message)
     }
   }
+
+  public async update ({params, request, response } : HttpContextContract){
+    try{
+      // Valida os dados recebidos na requisição usando o TeacherValidator
+      const data = await request.validate(TeacherValidator)
+
+      // Encontra o professor pelo ID
+      const teacher = await Teacher.findOrFail(params.id)
+
+      // Atualiza os dados do professor com os novos valores
+      teacher.name = data.name
+      teacher.email = data.email
+      teacher.birthdate = data.birthdate
+
+      // Salva o registro do professor atualizado
+      await teacher.save()
+      return response.status(200).json('Updated')
+    } catch (error) {
+      // Trata quaisquer erros que ocorram durante o processo
+      console.log(error)
+      return response.status(500).json(error.message)
+    }
+  }
 }
