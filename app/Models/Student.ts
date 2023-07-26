@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, ManyToMany, column, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import Room from './Room'
 
 export default class Student extends BaseModel {
   @column({ isPrimary: true })
@@ -22,4 +23,9 @@ export default class Student extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @manyToMany(() => Room, {
+    pivotTable: 'room_student',
+  })
+  public rooms: ManyToMany<typeof Room>
 }
