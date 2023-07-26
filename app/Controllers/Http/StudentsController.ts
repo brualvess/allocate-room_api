@@ -62,4 +62,19 @@ export default class StudentsController {
       return response.status(500).json(error.message)
     }
   }
+  public async destroy ({ params, response }: HttpContextContract){
+    try{
+      // Busca o aluno pelo ID
+      const student = await Student.findByOrFail('id', params.id)
+      if (student) {
+        // Exclui o aluno
+        await student.delete()
+        return response.status(200).json('Deleted')
+      }
+    }catch (error) {
+      // Trata quaisquer erros que ocorram durante o processo
+      console.log(error)
+      return response.status(500).json(error.message)
+    }
+  }
 }
