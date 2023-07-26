@@ -7,7 +7,7 @@ export default class EmailValidator {
   public schema = schema.create({
     name: schema.string(),
     email: schema.string({}, [rules.email()]),
-    birthdate: schema.date(),
+    birthdate: schema.date({format: 'dd-MM-yyyy'}),
 
   })
   public messages: CustomMessages = {

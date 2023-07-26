@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Student from 'App/Models/Student'
 import EmailValidator from 'App/Validators/StudentValidator'
-
 export default class StudentsController {
   public async store ({ request, response }: HttpContextContract) {
     try {
@@ -30,11 +29,37 @@ export default class StudentsController {
       await Student.create({...obj})
 
       // Retorna o novo aluno criado na resposta
-      return response.status(201).json({message: 'Usuário cadastrado com sucesso'})
+      return response.status(201).json({
+        message: 'Created',
+        name: obj.name,
+        registration: obj.registration,
+
+      })
     } catch (error) {
       // Se a validação falhar, retorna as mensagens de erro
       console.log(error)
       return response.status(400).json(error.messages)
+    }
+  }
+
+  public async show ({ params, response }: HttpContextContract){
+    try{
+      // Consulta o aluno pelo ID e seleciona apenas os campos desejados
+      const student = await Student.query()
+        .where('id', params.id)
+        .select('id', 'name', 'email', 'registration', 'birthdate')
+        .first()
+      if (student) {
+        // Retorna os dados do aluno se encontrado
+        return response.status(200).json(student)
+      } else {
+        // Se nenhum aluno for encontrado com o número do ID informado
+        return response.status(404).json({ message: 'Not Found' })
+      }
+    } catch (error) {
+      // Trata quaisquer erros que ocorram durante o processo
+      console.log(error)
+      return response.status(500).json(error.message)
     }
   }
 }
